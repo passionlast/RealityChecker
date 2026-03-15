@@ -165,7 +165,7 @@ func (bm *Manager) CheckDomainsWithProgress(ctx context.Context, domains []strin
 
 	// 收集结果并显示进度
 	completed := 0
-	timeout := time.NewTimer(15 * time.Second) // 添加15秒总超时
+	timeout := time.NewTimer(60 * time.Second) // 添加60秒总超时
 	defer timeout.Stop()
 
 	for completed < len(domains) {
