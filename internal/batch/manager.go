@@ -421,10 +421,10 @@ func (bm *Manager) calculateStars(result *types.DetectionResult) int {
 		stars++
 	}
 
-	// 2. 握手时间延迟小 (<= 200ms)
+	// 2. 握手时间延迟小 (<= 50ms)
 	if result.TLS != nil && result.TLS.HandshakeTime > 0 {
 		handshakeMs := int(result.TLS.HandshakeTime.Milliseconds())
-		if handshakeMs <= 200 {
+		if handshakeMs <= 50 {
 			stars++
 		}
 	}
@@ -439,9 +439,9 @@ func (bm *Manager) calculateStars(result *types.DetectionResult) int {
 		stars++
 	}
 
-	// 5. 证书时间长 (>= 60天)
+	// 5. 证书时间长 (>= 5天)
 	if result.Certificate != nil && result.Certificate.Valid {
-		if result.Certificate.DaysUntilExpiry >= 60 {
+		if result.Certificate.DaysUntilExpiry >= 5 {
 			stars++
 		}
 	}
