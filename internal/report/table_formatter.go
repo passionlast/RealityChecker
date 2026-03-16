@@ -249,9 +249,9 @@ func (tf *TableFormatter) calculateRecommendationStars(result *types.DetectionRe
 		stars++
 	}
 
-	// 5. 证书时间长 (>= 10天)
+	// 5. 证书时间长 (>= 5天)
 	if result.Certificate != nil && result.Certificate.Valid {
-		if result.Certificate.DaysUntilExpiry >= 60 {
+		if result.Certificate.DaysUntilExpiry >= 5 {
 			stars++
 		}
 	}
