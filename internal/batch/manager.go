@@ -400,14 +400,30 @@ func formatDuration(d time.Duration) string {
 	}
 }
 
-// sortByRecommendationStars 按推荐星级排序，1星在最上面，5星在最下面
+// sortByRecommendationStars 按推荐星级排序，星级相同时按握手时间排序
+// 排序规则：1星在最上面，5星在最下面；星级相同时，握手时间越短（越优）越靠下，
+// 与"更优的排在下面"这一原则保持一致
 func (bm *Manager) sortByRecommendationStars(results []*types.DetectionResult) {
 	// 使用sort.Slice进行排序
 	sort.Slice(results, func(i, j int) bool {
 		starsI := bm.calculateStars(results[i])
 		starsJ := bm.calculateStars(results[j])
-		return starsI < starsJ // 升序排列：1星在前，5星在后
+		if starsI != starsJ {
+			return starsI < starsJ // 升序排列：1星在前，5星在后
+		}
+		// 星级相同时，按握手时间排序：握手时间长（或缺失）的在前，短的（更优）在后
+		return bm.handshakeTimeForSort(results[i]) > bm.handshakeTimeForSort(results[j])
 	})
+}
+
+// handshakeTimeForSort 返回用于排序的握手时间；数据缺失或无效时返回一个极大值，
+// 使其在同星级内排在较靠前（较差）的位置
+func (bm *Manager) handshakeTimeForSort(result *types.DetectionResult) time.Duration {
+	const maxHandshakeTime = time.Hour // 哨兵值：视为最差
+	if result.TLS != nil && result.TLS.HandshakeTime > 0 {
+		return result.TLS.HandshakeTime
+	}
+	return maxHandshakeTime
 }
 
 // calculateStars 计算域名的推荐星级数量
